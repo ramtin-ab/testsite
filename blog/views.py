@@ -1,11 +1,15 @@
 from django.shortcuts import render,get_object_or_404
 from blog.models import *
 # Create your views here.
-def blog_home(request):
-    posts=Post.objects.filter(status=1)
+def blog_home(request,name=None):
+    if name!=None:
+        posts=Post.objects.filter(status=1)
+        posts=posts.filter(category__name=name)
+    else:
+        posts=Post.objects.filter(status=1)
+
     context={'posts':posts}
     return render(request,'blog/blog-home.html',context)
-
 
 
 def blog_single(request,pid):
@@ -16,7 +20,27 @@ def blog_single(request,pid):
     return render(request,'blog/blog-single.html',context)
 
 
-def test(request):
-    posts=Post.objects.get(id=1)
+def test(request,name=None):
+
+    posts=Post.objects.filter(status=1)
+    if name!=None:
+        posts=posts.filter(content__contains=name)
     context={'posts':posts}
-    return render(request,'website/test.html',context)
+    return render(request,'blog/test.html',context)
+   
+
+
+def author(request,author):
+    posts=Post.objects.filter(status=1)
+    posts=posts.filter(author__username=author)
+    context={'posts':posts}
+
+    return render(request,'blog/blog-home.html',context)
+
+
+def search(request):
+    posts=Post.objects.filter(status=1)
+    q=request.GET.get('q')
+    posts=posts.filter(content__contains=q)
+    context={'posts':posts}
+    return render(request,'blog/blog-home.html',context)
